@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% block title %}Register{% endblock %}
+{% block css %}
+
+#register_div{border:1px solid #00000029;height:450px;border-radius:15px}
+#register_btn{background-color:#04aa6d;color:white;border-radius:25px;border: 1px solid black;
+font-size: 18px;height: 50px;width: 40%;text-align: center;;margin-left:20%;font-weight: 600;
+cursor: pointer;}
+#email_alert_text{display: none;color: #d9212c;font-size: 13px;font-weight: 400;margin-left: 17%;}
+  
+{% endblock %}
+
+{% block body %}
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-3"></div>
+        <div class="col-md-6" id="register_div"><div class="m-4" style="color:#282a35;
+        font-weight: 700;font-size: 29px;">Register</div>
+        <!-- input form -->
+        <form action="/register" method="post">
+          {%csrf_token%}
+        <div class="mb-5 row">
+            <label for="username" class="col-sm-2 col-form-label" style="font-size:16px;font-weight:600">Username</label>
+            <div class="col-sm-10">
+              <input value="{{username}}" name="username" required minlength="7" type="text"
+              onBlur="if(this.value.trim() == '') {this.value = ''}" class="form-control" id="username" style="width:70%">
+            </div>
+          </div>
+          <div class="mb-5 row">
+            <label id="em" for="email" class="col-sm-2 col-form-label"style="font-size:16px;font-weight:600">Email</label>
+            <div class="col-sm-10">
+              <input data-email="{{email_alert}}" value="{{email}}" name="email" required type="email" class="form-control" id="email"  style="width:70%">
+            </div>
+            <div class="mt-1" id="email_alert_text">Email already registered</div>
+          </div>
+          <div class="mb-5 row">
+            <label for="password" class="col-sm-2 col-form-label"style="font-size:16px;font-weight:600">Password</label>
+            <div class="col-sm-10">
+              <input name="password" required minlength="7" type="password" class="form-control" id="password"  style="width:70%">
+            </div>
+          </div>
+          <input id="register_btn" type="submit" value="Register" class="mb-3" >
+        </form>
+        <!-- input form -->
+
+    </div>
+    <div class="col-md-3"></div>
+
+    </div>
+</div>
+
+<!-- javascript -->
+<script>
+const email_alert=document.getElementById("email").dataset.email;
+if(email_alert=="exists"){
+  document.getElementById("email_alert_text").style.display="block";
+  document.getElementsByTagName('input')[2].style.border = '1px solid #d9212c';
+
+}
+    if ( window.history.replaceState ) {
+        window.history.replaceState( null, null, window.location.href );
+    }
+</script>
+{% endblock %}

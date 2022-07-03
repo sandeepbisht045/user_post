@@ -1,0 +1,145 @@
+{% extends "base.html" %}
+{% block title %}Posts{% endblock %}
+{% block css %}
+#textarea_alert_text{display: none;color: #d9212c;font-size: 13px;font-weight: 400;margin-left: 17%;}
+#txtarea{width:70%;resize: none;background-image: linear-gradient(#F5F7FA,#B8C6DB);}
+#no_post{color:gold;font-weight:bold;font-size: x-large;text-align: center;}
+#first_post{ animation: move 4s linear infinite;color:#785FBE}
+@keyframes move {
+  0%   {font-size: x-large}
+  25%  {font-size: larger}
+  50%  {font-size: large}
+  75%  {font-size: medium}
+  100% {font-size: x-large}
+}
+{% endblock %}
+
+{% block body %}
+<div class="container mt-4 mb-5" style="border:1px solid #00000029; border-radius:1%;">
+    <div class="row">
+        <div class="col-md-3"></div>
+        <div class="col-md-9">
+            <!-- post form -->
+            <form action="/posts" method="post">
+                {%csrf_token%}
+              <div class="mb-3 mt-3 row">
+                  <div class="col-sm-10">
+                    <textarea name="post" required minlength="5" data-alert="{{alert}}"
+                     rows="4"
+                    class="form-control" id="txtarea">{{text}} </textarea>
+            <div class="mt-1" id="textarea_alert_text"><b>Only alphabetic & numeric characters are allowed.</b></div>
+
+                  </div>
+                </div>
+          <input id="post_btn" type="submit" value="Post" class="mb-4" style="background-color:
+           #1B74E4;border-radius: 25px; width: 20%;border: 2px solid blue;margin-left:15%;">
+                
+                </form>
+<!-- post form -->
+        </div>
+        <div class="col-md-2" ></div>
+    </div>
+<!-- view post -->
+<div id="render_posts">
+  {%if not null%}
+{% for post in all_posts %}
+<div class="row " >
+    <div class="col-md-3"></div>
+    <div class="card col-md-9" style="width: 40%;background-image: linear-gradient(#F5F7FA,#B8C6DB);">
+        <div class="card-body">
+          <h5 class="card-title">{{post.user.username}}</h5>
+          <span style="font-size:14px ;" class="card-subtitle mb-2 text-muted">{{post.date_time}}</span>
+          <p class="card-text mt-2">{{post.text}}</p>
+        <button id="upvote_id" onclick="myFunction({{post.id}})" style="
+        font-size: small; font-weight: bold;" data-id="{{post.id}}" 
+        class="card-link btn btn-primary">Upvote</button>
+          <span style="margin-left: 2%;"> <b>{{post.upvotes_count}}</b>
+<img  src="https://img.favpng.com/10/8/7/like-button-social-media-image-facebook-messenger-png-favpng-YkquKiF4ePG3tMC0eT3hxUfgS.jpg" alt=""
+ width="7%" height="15%">
+
+        </span>
+        </div>
+      </div>
+</div>
+{%endfor%}
+{%endif%}
+</div>
+<!-- view post -->
+
+</div>
+{%if null%}
+<div id="no_post">
+  <div>No Post to show</div> <div class="mt-5" id="first_post">Write your first Post now</div>
+</div>
+{%endif%}
+<!-- javascript -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
+
+<script>
+  
+    // ajax
+  function myFunction(id){
+  const csrf=$("input[name=csrfmiddlewaretoken").val();
+console.log(id,"ajajjaajj")
+    $.ajax(
+    {
+        type:"POST",
+        url: `/upvotes/${id}`,
+        data:{
+                csrfmiddlewaretoken:csrf
+        },
+        success: function( data ) 
+        {
+            
+          const render_posts=document.getElementById("render_posts");
+          var output=""
+          // rendering post using js
+          for(const post of data){
+              // html
+            output+=
+            `
+            <div class="row " >
+    <div class="col-md-3"></div>
+    <div class="card col-md-9" style="width: 40%;background-image: linear-gradient(#F5F7FA,#B8C6DB);">
+        <div class="card-body">
+          <h5 class="card-title">${post.username}</h5>
+          <span style="font-size:14px ;" class="card-subtitle mb-2 text-muted">${post.date_time}</span>
+          <p class="card-text mt-2">${post.text}</p>
+        <button  id="upvote_id" onclick="myFunction(${post.id})" style="
+        font-size: small; font-weight: bold;" data-id="${post.id}" 
+        class="card-link btn btn-primary">Upvote</button>
+          <span style="margin-left: 2%;"><b>${post.upvotes_count}</b>
+            <img  src="https://img.favpng.com/10/8/7/like-button-social-media-image-facebook-messenger-png-favpng-YkquKiF4ePG3tMC0eT3hxUfgS.jpg" alt=""
+ width="7%" height="15%">
+        </span>
+        </div>
+      </div>
+</div>
+            `
+            console.log(typeof(post.date_time),"jsjsjssj")
+            // html
+
+          }
+          // rendering post using js
+
+          render_posts.innerHTML=output;
+            console.log(data,"ks")
+        }
+     })
+    };
+    // ajax
+
+    // txt area invalid text alert handling
+    const txtarea_alert=document.getElementById("txtarea").dataset.alert;
+if(txtarea_alert=="invalid"){
+  document.getElementById("textarea_alert_text").style.display="block";
+  document.getElementsByTagName('textarea')[0].style.border = '1px solid #d9212c';
+}
+    // txt area invalid text alert handling
+
+   
+        if ( window.history.replaceState ) {
+            window.history.replaceState( null, null, window.location.href );
+        }
+    </script>
+{% endblock %}
