@@ -3,6 +3,7 @@ from django.http import JsonResponse
 from . models import User,Post,Upvotes
 from django.forms.models import model_to_dict
 from pytz import timezone
+from django.contrib.auth.hashers import make_password,check_password
 
 
 # Create your views here.
@@ -16,7 +17,7 @@ def register(request):
                 User.objects.get(email=email)
                 return render(request,"register.html",{"email_alert":"exists","username":username,"email":email})
             except:
-                id=User.objects.create(username=username,email=email,password=password)
+                id=User.objects.create(username=username,email=email,password=make_password(password))
             request.session["id"] = id.pk
             request.session["user"] = id.username
 
@@ -33,15 +34,18 @@ def login(request):
         if request.method=="POST":
             email=request.POST.get("email")
             password=request.POST.get("password")
-            user_data=User.objects.filter(email=email,password=password)
-            if user_data.exists():
-                for i in user_data:
-                    request.session["id"] = i.id
-                    request.session["user"] = i.username
-                
-                return redirect("/posts")
-            else:
+            try:
+                user_data=User.objects.get(email=email)
+                is_valid=check_password(password,user_data.password)
+                if is_valid:
+                    request.session["id"] = user_data.id
+                    request.session["user"] = user_data.username
+                    return redirect("/posts")
                 return render(request,"login.html",{"alert":"invalid","email":email})
+                
+            except:
+                return render(request,"login.html",{"alert":"invalid","email":email})
+
         return render(request,"login.html")
     return redirect("/posts")
  
