@@ -80,7 +80,6 @@
     // ajax
   function myFunction(id){
   const csrf=$("input[name=csrfmiddlewaretoken").val();
-console.log(id,"ajajjaajj")
     $.ajax(
     {
         type:"POST",
@@ -116,14 +115,12 @@ console.log(id,"ajajjaajj")
       </div>
 </div>
             `
-            console.log(typeof(post.date_time),"jsjsjssj")
             // html
 
           }
           // rendering post using js
 
           render_posts.innerHTML=output;
-            console.log(data,"ks")
         }
      })
     };

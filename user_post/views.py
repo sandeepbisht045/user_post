@@ -5,8 +5,9 @@ from django.forms.models import model_to_dict
 from pytz import timezone
 from django.contrib.auth.hashers import make_password,check_password
 
-
 # Create your views here.
+
+# VIEWS TO REGISTER USER
 def register(request):
     if not request.session.get("id"):
         if request.method=="POST":
@@ -27,7 +28,7 @@ def register(request):
     return redirect("/login")
 
 
-
+# VIEWS TO LOGIN USER
 def login(request):
     
     if not request.session.get("id"): 
@@ -49,29 +50,31 @@ def login(request):
         return render(request,"login.html")
     return redirect("/posts")
  
+#  VIEWS TO LOGOUT USER
 def logout(request):
     if  request.session.get("id"):
         request.session.clear()
         return redirect("/login")
     return redirect("/login")
 
+# VIEWS TO CREATE AND RENDER POSTS
 def posts(request):
     if  request.session.get("id"): 
 
         if request.method=="POST":
-                post=request.POST.get("post").strip()
-                if post.isalnum():
-                    Post.objects.create(text=post,user=User.objects.get(id=request.session.get("id")))
-                    return render(request,"posts.html",{"all_posts":Post.objects.all()})
-                print(post,"jajaj")
-                return render(request,"posts.html",{"all_posts":Post.objects.all(),"text":post,"alert":"invalid"})
-        
+            post=request.POST.get("post").strip()
+            if post.replace(" ","").isalnum():
+                Post.objects.create(text=post,user=User.objects.get(id=request.session.get("id")))
+                return render(request,"posts.html",{"all_posts":Post.objects.all()})
+            return render(request,"posts.html",{"all_posts":Post.objects.all(),"text":post,"alert":"invalid"})
+    
         all_posts=Post.objects.all()
         if all_posts.exists():
             return render(request,"posts.html",{"all_posts":all_posts})
         return render(request,"posts.html",{"null":"null"})
     return redirect("/login")
 
+# VIEWS TO UPVOTE USER
 def upvotes(request,id):
     if  request.session.get("id"): 
         if request.method=="POST":
@@ -102,10 +105,9 @@ def upvotes(request,id):
                 query_to_dict=model_to_dict(data)
                 now_asia = data.date_time.astimezone(timezone('Asia/Kolkata'))
                 query_to_dict.update({"username":data.user.username,"date_time":now_asia.strftime("%B %d, %Y, %I:%M %P")})
-                # print(now_asia.strftime("%B %d, %Y, %I:%M %P"))
+            
                 data_list.append(query_to_dict)
-            # print(data_list)
-
+            
             return JsonResponse(data_list,safe=False)
         return redirect("/posts")   
     return redirect("/login")
